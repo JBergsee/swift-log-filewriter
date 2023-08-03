@@ -43,14 +43,14 @@ import Logging
 import Filewriter
 
     //Setup Log writing
-    let url = URL(fileURLWithPath: "./logs/logfile.txt")
+    let logfile = URL(fileURLWithPath: "./logs/logfile.txt")
     
 LoggingSystem.bootstrap { label in
     MultiplexLogHandler([
         // Setup the standard logging backend to enable console logging
         StreamLogHandler.standardOutput(label: label)
         //Setup the FileWriter to write log to file
-        
+        Filewriter(logfile: logfile, label: label)
     ])
 }
 ```
@@ -77,10 +77,10 @@ Filewriter is easily installed using Swift Package Manager.
 Add the Filewriter package as a dependency to your `Package.swift` file.
 
 ```swift
-.package(url: "https://github.com/JBergsee/swift-log-filewriter.git", from: "0.1.0")
+.package(url: "https://github.com/JBergsee/swift-log-filewriter.git", from: "0.1.1")
 ```
 
-Add LoggingSlack to your target's dependencies.
+Add Filewriter to your target's dependencies.
 
 ```swift
 .target(
