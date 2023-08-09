@@ -28,9 +28,6 @@ public struct Filewriter: LogHandler {
     /// The log label for the log handler.
     public var label: String = ""
 
-    /// Logging own problems.
-    private static let logger = Logger(label: "Filewriter")
-
     private static var defaultFW: Filewriter = {
         return Filewriter()
     }()
@@ -48,7 +45,7 @@ public struct Filewriter: LogHandler {
         didSet {
             if let logfile {
                 if !logfile.isFileURL {
-                    Filewriter.logger.warning("The logfile is no file URL. Removing")
+                    print("The logfile is no file URL. Removing")
                     self.logfile = nil
                 } else if !FileManager.default.fileExists(atPath: logfile.path) {
                     //Create directory and file
@@ -57,13 +54,13 @@ public struct Filewriter: LogHandler {
                         let timestamp = Filewriter.formatter.string(from: Date())
                         let data = "Logfile created \(timestamp)\n".data(using: .utf8)
                         try data!.write(to: logfile, options: .atomic)
-                        Filewriter.logger.info("Created new logfile at \(logfile.path)")
+                        print("Created new logfile at \(logfile.path)")
                     } catch {
-                        Filewriter.logger.warning("New logfile could not be created. \( error.localizedDescription)")
+                        print("New logfile could not be created. \( error.localizedDescription)")
                         self.logfile = nil
                     }
                 } else {
-                    Filewriter.logger.info("Logging to existing file at \(logfile.path)")
+                    print("Logging to existing file at \(logfile.path)")
                 }
             }
         }
@@ -95,7 +92,7 @@ public struct Filewriter: LogHandler {
 
     public func write(_ message: String) {
         guard let logfile else {
-            Filewriter.logger.notice("No logfile set.")
+            print("No logfile set.")
             return
         }
 
@@ -107,10 +104,13 @@ public struct Filewriter: LogHandler {
             let fileHandle = try FileHandle(forWritingTo: logfile)
             try fileHandle.seekToEnd()
             try fileHandle.write(contentsOf: data)
-            try fileHandle.synchronize()
+//            if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
+//                try fileHandle.synchronize()
+//            }
             try fileHandle.close()
         } catch {
-            Filewriter.logger.error("Unable to write to file. \nError: \(error.localizedDescription)")
+            print("Unable to write to file.")
+            print("Error: \(error.localizedDescription)")
         }
     }
 
@@ -129,10 +129,6 @@ public struct Filewriter: LogHandler {
                     file: String,
                     function: String,
                     line: UInt) {
-        guard let logfile else {
-            Filewriter.logger.notice("No logfile set.")
-            return
-        }
 
         Filewriter.formatter.dateFormat = dateFormat
         let timestamp = Filewriter.formatter.string(from: Date())

@@ -5,11 +5,17 @@ import Logging
 final class swift_log_filewriterTests: XCTestCase {
 
 
-    @available(macOS 13.0, *)
     func testStaticVSInstanceWrites() {
         let tempdir = FileManager.default.temporaryDirectory
-        let staticLog = tempdir.appending(path: "staticlog.txt", directoryHint: .notDirectory)
-        let instanceLog = tempdir.appending(path: "instanceLog.txt", directoryHint: .notDirectory)
+        var staticLog, instanceLog: URL
+//        if #available(macOS 13.0, iOS 16.0, *) {
+//            staticLog = tempdir.appending(path: "staticlog.txt", directoryHint: .notDirectory)
+//            instanceLog = tempdir.appending(path: "instanceLog.txt", directoryHint: .notDirectory)
+//        } else {
+            // Fallback on earlier versions
+            staticLog = tempdir.appendingPathComponent("staticlog.txt", isDirectory: false)
+            instanceLog = tempdir.appendingPathComponent("instanceLog.txt", isDirectory: false)
+//        }
         Filewriter.logfile = staticLog
         let instanceWriter = Filewriter(logfile: instanceLog, label: "InstanceWriter")
 
